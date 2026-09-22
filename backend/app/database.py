@@ -10,10 +10,17 @@ DATABASE_URL = os.getenv(
     "mysql+pymysql://root:YOUR_PASSWORD@localhost:3306/vitalsignai",
 )
 
-# pool_pre_ping avoids "MySQL server has gone away" errors on idle connections
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    connect_args={"ssl": {}},
+)
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine,
+)
 
 Base = declarative_base()
 
