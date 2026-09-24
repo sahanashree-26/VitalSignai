@@ -1,0 +1,38 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: vitalsignai-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: vitalsignai_root
+      MYSQL_DATABASE: vitalsignai
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build: ./backend
+    container_name: vitalsignai-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: mysql+pymysql://root:vitalsignai_root@db:3306/vitalsignai
+      SECRET_KEY: docker-secret-key
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      CORS_ORIGINS: http://localhost:3000
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: vitalsignai-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
